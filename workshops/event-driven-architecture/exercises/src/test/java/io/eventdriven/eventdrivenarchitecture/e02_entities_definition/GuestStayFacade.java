@@ -45,17 +45,16 @@ public class GuestStayFacade {
     }
 
     public void recordPayment(GuestStayAccountCommand.RecordPayment command) {
-        var account = database.get(GuestStayAccount.class, command.guestStayId())
+      GuestStayAccount account = database.get(GuestStayAccount.class, command.guestStayId())
             .orElseThrow(() -> new IllegalStateException("Entity not found"));
 
-        // TODO: Fill the implementation calling your entity/aggregate
-        // account.doSomething;
-        Object[] events = new Object[] {};
-
-        database.store(command.guestStayId(), account);
-        eventBus.publish(events);
-
-        throw new RuntimeException("TODO: Fill the implementation calling your entity/aggregate");
+      if (account.getStatus() == GuestStatus.CHECK_OUT) {
+        throw new RuntimeException("Guest has been already checked out. Operation not permitted");
+      }
+      account.setBalance(account.getBalance() + command.amount);
+      database.store(command.guestStayId(), account);
+      eventBus.publish(new Object[] {
+        new GuestStayAccountEvent.PaymentRecorded(account.getGuestId(), command.amount, command.now()) });
     }
 
     public void checkOutGuest(GuestStayAccountCommand.CheckOutGuest command) {
