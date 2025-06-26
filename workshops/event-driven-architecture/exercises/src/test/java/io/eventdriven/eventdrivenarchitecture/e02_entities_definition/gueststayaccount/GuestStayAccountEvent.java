@@ -1,4 +1,4 @@
-package io.eventdriven.eventdrivenarchitecture.e02_entities_definition;
+package io.eventdriven.eventdrivenarchitecture.e02_entities_definition.gueststayaccount;
 
 import org.springframework.lang.Nullable;
 
